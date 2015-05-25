@@ -1,4 +1,4 @@
-package br.usp.icmc.ssc0103.util;
+package br.usp.icmc.scc0103.model;
 
 public class Livro {
 	

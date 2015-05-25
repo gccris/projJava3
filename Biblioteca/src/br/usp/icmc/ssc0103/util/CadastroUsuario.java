@@ -2,6 +2,8 @@ package br.usp.icmc.ssc0103.util;
 
 import java.util.ArrayList;
 
+import br.usp.icmc.scc0103.model.Livro;
+import br.usp.icmc.scc0103.model.Usuario;
 import br.usp.icmc.ssc0103.util.*;
 
 public class CadastroUsuario {

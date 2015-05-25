@@ -1,6 +1,9 @@
 package br.usp.icmc.ssc0103.executavel;
 
+import br.usp.icmc.scc0103.model.Usuario;
 import br.usp.icmc.ssc0103.util.*;
+
+import java.util.Date;
 import java.util.Scanner;
 
 public class Principal {
@@ -8,9 +11,22 @@ public class Principal {
 	public static void main(String[] args)
 	{
 		Scanner leitor = new Scanner(System.in);
+		Date data = lerDataUsuario(leitor);
+		Integer opcao;
 		Usuario usuario = new Usuario();
 		String nomeArquivoUsuarios = "usuarios.csv";
 		Boolean sucessoLogin;
+		
+		Integer logOuCad = leitor.nextInt();
+		System.out.println("Escolha uma opcao: ");
+		System.out.println("1 - Logar no sistema");
+		System.out.println("2 - Realizar novo cadastro");
+		/*
+		if(logOuCad == 1)
+			LoginUsuario.logar();
+		else if(logOuCad == 2)
+			CadastroUsuario.cadastrar();*/
+		
 		do
 		{
 			System.out.println("Insira seu login: ");
@@ -19,11 +35,34 @@ public class Principal {
 			usuario.setSenha(leitor.nextLine().trim());
 			sucessoLogin = LoginUsuario.logar(new Usuario("aluno","teste","teste"),nomeArquivoUsuarios);
 		} while(!sucessoLogin);
+		
 		//exibe o menu de opcoes para o usuario
-		menu(leitor);
+		do{
+			opcao = opcaoUsuario(leitor);
+			
+		} while(opcao != 9);
 	}
 	
-	public static void menu(Scanner leitor){
+	public static Date lerDataUsuario(Scanner leitor){
+		Date novaData = new Date();
+		Integer aux;
+		
+		System.out.println("Informe o dia para a data do sistema: ");
+		aux = leitor.nextInt();
+		novaData.setDate(aux);
+		
+		System.out.println("Informe o mes para a data do sistema: ");
+		aux = leitor.nextInt();
+		novaData.setMonth(aux);
+		
+		System.out.println("Informe o ano para a data do sistema: ");
+		aux = leitor.nextInt();
+		novaData.setYear(aux);
+		
+		return novaData;
+	}
+	
+	public static Integer opcaoUsuario(Scanner leitor){
 		System.out.println("Bem vindo ao sistema da biblioteca");
 		System.out.println("Escolha uma opcao de acesso: ");
 		System.out.println("1 - Pegar um livro emprestado.");
@@ -31,7 +70,6 @@ public class Principal {
 		System.out.println("3 - Listar todos os usuarios cadastrados.");
 		System.out.println("4 - Listar todos os empréstimos.");
 		System.out.println("9 - Sair do sistema.");
-		Integer opcao = leitor.nextInt();
-
+		return leitor.nextInt();
 	}
 }
