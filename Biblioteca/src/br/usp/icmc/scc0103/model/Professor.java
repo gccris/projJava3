@@ -13,7 +13,7 @@ public class Professor extends Pessoa{
 		return true;
 	}
 	
-	public boolean PegaEmprestadoLivro(Livro l){
+	public boolean pegaEmprestadoLivro(Livro l){
 		if(getLivrosEmprestados().size()<6){
 			emprestarLivro(l);
 			return true;

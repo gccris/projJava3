@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import br.usp.icmc.scc0103.model.*;;
 
@@ -28,6 +29,28 @@ public class ManipulaCSV {
 		this.nomeArquivoUsuarios = nomeArquivoUsuario;
 		this.nomeArquivoEmprestimos = nomeArquivoEmprestimos;
 		this.nomeArquivoLivros = nomeArquivoLivros;
+	}
+	
+	//ARQUIVO CSV: TIPO,NOME,CODIGO
+	public ArrayList<Livro> loadLivros(){
+		ArrayList<Livro> listLivros = new ArrayList<Livro>();
+		BufferedReader leitor = null;
+		String linha;
+		
+		try {
+			leitor = new BufferedReader(new FileReader(this.nomeArquivoLivros));
+			while((linha = leitor.readLine()) != null){
+				String[] livro = linha.split(",");
+				Livro l = new Livro(livro[0],livro[1],livro[2]);
+				listLivros.add(l);
+			}
+			leitor.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+		return listLivros;
 	}
 	
 	//ARQUIVO CSV: TIPO,NOME,CPF
@@ -56,16 +79,55 @@ public class ManipulaCSV {
 			}
 			leitor.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return listUsers;
 	}
 	
+	//ARQUIVO CSV: CODIGO LIVRO, CPF, DATE
+	public ArrayList<Emprestimo> loadEmprestimos(ArrayList<Pessoa> listUsers,ArrayList<Livro> listLivros){
+		ArrayList<Emprestimo> listEmprestimos = new ArrayList<Emprestimo>();
+		BufferedReader leitor = null;
+		String linha;
+		
+		try {
+			leitor = new BufferedReader(new FileReader(this.nomeArquivoEmprestimos));
+			while((linha = leitor.readLine()) != null){
+				String[] emprestimo = linha.split(",");
+				Pessoa p = findPessoaPorCPF(listUsers,emprestimo[1]);
+				Livro l = findLivroPorCodigo(listLivros,emprestimo[0]);
+				p.pegaEmprestadoLivro(l);
+				Date d = new Date(emprestimo[2]);
+				Emprestimo e = new Emprestimo(l,p,d);
+				listEmprestimos.add(e);
+			}
+			leitor.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+		return listEmprestimos;
+	}
+	
+	private Pessoa findPessoaPorCPF(ArrayList<Pessoa> listUsers,String CPF){
+		for(Pessoa p:listUsers){
+			if ((p.getCpf().compareTo(CPF)) == 0)
+				return p;
+		}
+		return null;
+	}
+	
+	private Livro findLivroPorCodigo(ArrayList<Livro> listLivros,String codigo){
+		for(Livro l:listLivros){
+			if ((l.getCodigo().compareTo(codigo)) == 0)
+				return l;
+		}
+		return null;
+	}
 	
 	public void cadastrarUsuario(Pessoa usuario)
 	{

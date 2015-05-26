@@ -4,13 +4,13 @@ import java.util.Date;
 
 public class Emprestimo {
 	private Livro livroEmprestado;
-	private Aluno alunoComLivro;
+	private Pessoa pessoaComLivro;
 	private Date dataAluguel;
 	
-	public Emprestimo(Livro l, Aluno a, Date d){
+	public Emprestimo(Livro l, Pessoa p, Date d){
 		super();
 		this.setLivroEmprestado(l);
-		this.setAlunoComLivro(a);
+		this.setPessoaComLivro(p);
 		this.setDataAluguel(d);
 	}
 	
@@ -22,20 +22,20 @@ public class Emprestimo {
 		this.livroEmprestado = livroEmprestado;
 	}
 
-	public Aluno getAlunoComLivro() {
-		return alunoComLivro;
-	}
-
-	public void setAlunoComLivro(Aluno alunoComLivro) {
-		this.alunoComLivro = alunoComLivro;
-	}
-
 	public Date getDataAluguel() {
 		return dataAluguel;
 	}
 
 	public void setDataAluguel(Date dataAluguel) {
 		this.dataAluguel = dataAluguel;
+	}
+
+	public Pessoa getPessoaComLivro() {
+		return pessoaComLivro;
+	}
+
+	public void setPessoaComLivro(Pessoa pessoaComLivro) {
+		this.pessoaComLivro = pessoaComLivro;
 	}
 	
 }

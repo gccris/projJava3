@@ -14,7 +14,7 @@ public class Comunidade extends Pessoa{
 		return true;
 	}
 	
-	public boolean PegaEmprestadoLivro(Livro l){
+	public boolean pegaEmprestadoLivro(Livro l){
 		if(getLivrosEmprestados().size()<2){
 			emprestarLivro(l);
 			return true;

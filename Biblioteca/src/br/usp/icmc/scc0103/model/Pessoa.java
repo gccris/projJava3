@@ -58,4 +58,9 @@ public class Pessoa {
 		this.cpf = cpf;
 	}
 	
+	public boolean pegaEmprestadoLivro(Livro l){
+		this.emprestarLivro(l);
+		return true;
+	}
+	
 }
