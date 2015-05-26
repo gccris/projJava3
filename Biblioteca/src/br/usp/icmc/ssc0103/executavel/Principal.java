@@ -1,6 +1,5 @@
 package br.usp.icmc.ssc0103.executavel;
 
-import br.usp.icmc.scc0103.model.Usuario;
 import br.usp.icmc.ssc0103.util.*;
 
 import java.util.Date;
@@ -13,9 +12,9 @@ public class Principal {
 		Scanner leitor = new Scanner(System.in);
 		Date data = lerDataUsuario(leitor);
 		Integer opcao;
-		Usuario usuario = new Usuario();
+		//Usuario usuario = new Usuario();
 		String nomeArquivoUsuarios = "usuarios.csv";
-		Boolean sucessoLogin;
+		Boolean sucessoLogin = null;
 		
 		Integer logOuCad = leitor.nextInt();
 		System.out.println("Escolha uma opcao: ");
@@ -30,10 +29,10 @@ public class Principal {
 		do
 		{
 			System.out.println("Insira seu login: ");
-			usuario.setLogin(leitor.nextLine().trim());
+			//usuario.setLogin(leitor.nextLine().trim());
 			System.out.println("Insira sua senha: ");
-			usuario.setSenha(leitor.nextLine().trim());
-			sucessoLogin = LoginUsuario.logar(new Usuario("aluno","teste","teste"),nomeArquivoUsuarios);
+			//usuario.setSenha(leitor.nextLine().trim());
+			//sucessoLogin = LoginUsuario.logar(new Usuario("aluno","teste","teste"),nomeArquivoUsuarios);
 		} while(!sucessoLogin);
 		
 		//exibe o menu de opcoes para o usuario

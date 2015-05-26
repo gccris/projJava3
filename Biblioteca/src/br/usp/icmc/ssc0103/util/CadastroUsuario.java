@@ -3,7 +3,7 @@ package br.usp.icmc.ssc0103.util;
 import java.util.ArrayList;
 
 import br.usp.icmc.scc0103.model.Livro;
-import br.usp.icmc.scc0103.model.Usuario;
+import br.usp.icmc.scc0103.model.Pessoa;
 import br.usp.icmc.ssc0103.util.*;
 
 public class CadastroUsuario {
@@ -25,17 +25,17 @@ public class CadastroUsuario {
 		this.nomeArquivoUsuarios = nomeArquivo;
 	}
 	
-	public void cadastrarUsuario(Usuario usuario)
+	public void cadastrarUsuario(Pessoa usuario)
 	{
 		//TODO
 	}
 	
-	public void cadastrarEmprestimo(Usuario usuario,Livro livro)
+	public void cadastrarEmprestimo(Pessoa usuario,Livro livro)
 	{
 		//TODO
 	}
 	
-	public ArrayList<Livro> getLivrosPorUsuario(Usuario user)
+	public ArrayList<Livro> getLivrosPorUsuario(Pessoa user)
 	{
 		return null;
 	}
