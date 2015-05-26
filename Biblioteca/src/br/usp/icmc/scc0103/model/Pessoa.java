@@ -17,6 +17,14 @@ public class Pessoa {
 		this.setCpf(cpf);
 		this.livrosEmprestados = new ArrayList<Livro>();
 	}
+	
+	public Pessoa(String nome,String cpf,Date d) {
+		super();
+		this.setNome(nome);
+		this.setDiaSuspensao(d);
+		this.setCpf(cpf);
+		this.livrosEmprestados = new ArrayList<Livro>();
+	}
 		
 	public ArrayList<Livro> getLivrosEmprestados() {
 		return livrosEmprestados;

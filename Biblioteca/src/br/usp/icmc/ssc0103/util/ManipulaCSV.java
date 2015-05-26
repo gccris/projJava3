@@ -53,7 +53,7 @@ public class ManipulaCSV {
 		return listLivros;
 	}
 	
-	//ARQUIVO CSV: TIPO,NOME,CPF
+	//ARQUIVO CSV: TIPO,NOME,CPF,DATASUSPENSAO
 	public ArrayList<Pessoa> loadUsuarios(){
 		ArrayList<Pessoa> listUsers = new ArrayList<Pessoa>();
 		BufferedReader leitor = null;
@@ -63,17 +63,17 @@ public class ManipulaCSV {
 			leitor = new BufferedReader(new FileReader(this.nomeArquivoUsuarios));
 			while((linha = leitor.readLine()) != null){
 				String[] user = linha.split(",");
-				
+				Date d = new Date(user[3]);
 				if((user[0].compareTo("0")) == 0){//aluno
-					Aluno a = new Aluno(user[1],user[2]);
+					Aluno a = new Aluno(user[1],user[2],d);
 					listUsers.add(a);
 				}
 				else if((user[0].compareTo("1")) == 0){//professor
-					Professor p = new Professor(user[1],user[2]);
+					Professor p = new Professor(user[1],user[2],d);
 					listUsers.add(p);
 				}
 				else if((user[0].compareTo("2")) == 0){//comunidade
-					Comunidade c = new Comunidade(user[1],user[2]);
+					Comunidade c = new Comunidade(user[1],user[2],d);
 					listUsers.add(c);
 				}
 			}

@@ -5,7 +5,9 @@ import java.util.Date;
 public class Comunidade extends Pessoa{
 	public Comunidade(String nome, String cpf) {
 		super(nome,cpf);
-		// TODO Auto-generated constructor stub
+	}
+	public Comunidade(String nome, String cpf,Date d) {
+		super(nome,cpf,d);
 	}
 	
 	public boolean estaSuspenso(Date diaAtual){

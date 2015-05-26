@@ -6,6 +6,9 @@ public class Aluno extends Pessoa{
 	public Aluno(String nome, String cpf) {
 		super(nome,cpf);
 	}
+	public Aluno(String nome, String cpf,Date d) {
+		super(nome,cpf,d);
+	}
 	
 	public boolean estaSuspenso(Date diaAtual){
 		if(getDiaSuspensao().compareTo(diaAtual) < 0)
