@@ -97,8 +97,8 @@ public class ManipulaCSV {
 			leitor = new BufferedReader(new FileReader(this.nomeArquivoEmprestimos));
 			while((linha = leitor.readLine()) != null){
 				String[] emprestimo = linha.split(",");
-				Pessoa p = findPessoaPorCPF(listUsers,emprestimo[1]);
-				Livro l = findLivroPorCodigo(listLivros,emprestimo[0]);
+				Pessoa p = GerenciaBiblioteca.findPessoaPorCPF(listUsers,emprestimo[1]);
+				Livro l = GerenciaBiblioteca.findLivroPorCodigo(listLivros,emprestimo[0]);
 				p.pegaEmprestadoLivro(l);
 				Date d = new Date(emprestimo[2]);
 				Emprestimo e = new Emprestimo(l,p,d);
@@ -113,21 +113,6 @@ public class ManipulaCSV {
 		return listEmprestimos;
 	}
 	
-	private Pessoa findPessoaPorCPF(ArrayList<Pessoa> listUsers,String CPF){
-		for(Pessoa p:listUsers){
-			if ((p.getCpf().compareTo(CPF)) == 0)
-				return p;
-		}
-		return null;
-	}
-	
-	private Livro findLivroPorCodigo(ArrayList<Livro> listLivros,String codigo){
-		for(Livro l:listLivros){
-			if ((l.getCodigo().compareTo(codigo)) == 0)
-				return l;
-		}
-		return null;
-	}
 	
 	public void cadastrarUsuario(Pessoa usuario)
 	{
