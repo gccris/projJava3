@@ -2,7 +2,7 @@ package br.usp.icmc.scc0103.model;
 
 public class Livro {
 	
-	private String tipo;	//texto (aluno e professor podem emprestar) ou geral(todos)
+	private String tipo;	//0 (aluno e professor podem emprestar)1(todos)
 	private String nome;
 	private String codigo;
 	
