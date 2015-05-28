@@ -1,6 +1,9 @@
 package br.usp.icmc.ssc0103.util;
 
 import java.util.ArrayList;
+import java.util.Date;
+
+import javax.swing.JSpinner.DateEditor;
 
 import br.usp.icmc.scc0103.model.Emprestimo;
 import br.usp.icmc.scc0103.model.Livro;
@@ -89,5 +92,28 @@ public class GerenciaBiblioteca {
 				livrosNaoAlugados.add(l);
 		}
 		return livrosNaoAlugados;
+	}
+	
+	//encontra os emprestimos atrasados numa certa data
+	public static ArrayList<Emprestimo> findLivrosAtrasados(ArrayList<Emprestimo> listEmprestimos,Date dataAtual){
+		ArrayList<Emprestimo> listAtrasados = new ArrayList<Emprestimo>();
+		for(Emprestimo e:listEmprestimos){
+			if(e.getDataAluguel().after(dataAtual))
+				listAtrasados.add(e);
+		}
+		return listAtrasados;
+	}
+	
+	//calcula o tempo atrasado do usuario
+	public static int calculaTempoAtrasado(Emprestimo e,Date dataAtual){
+		long diff = dataAtual.getTime() - e.getDataAluguel().getTime();
+		return (int)diff;
+	}
+	
+	//suspende usuario por determinado tempo
+	public static void suspendeUsuario(Pessoa p,Date dataAtual,int diasAtraso){
+		Date dataSuspensao = new Date();
+		dataSuspensao.setTime(dataAtual.getTime() + diasAtraso * 24 * 60 * 60 * 1000);
+		p.setDiaSuspensao(dataSuspensao);
 	}
 }
