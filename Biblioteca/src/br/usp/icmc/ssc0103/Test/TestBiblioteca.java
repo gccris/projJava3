@@ -1,4 +1,5 @@
 package br.usp.icmc.ssc0103.Test;
+
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;

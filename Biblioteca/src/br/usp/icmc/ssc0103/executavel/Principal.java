@@ -1,16 +1,17 @@
 package br.usp.icmc.ssc0103.executavel;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
+import java.util.ArrayList;
 
+import br.usp.icmc.scc0103.model.*;
 import br.usp.icmc.ssc0103.util.*;
 import javafx.application.Application;
-import javafx.geometry.Pos;
+import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.layout.*;
-import javafx.scene.text.Font;
-import javafx.stage.Stage;
+import javafx.scene.text.*;
+import javafx.stage.*;
 
 public class Principal extends Application {
 
@@ -24,7 +25,7 @@ public class Principal extends Application {
 	Label msgCadUser, msgCadLivro, msgEmprestar, msgDevolver;
 	TextField name, name2, name3, doc;
 	TextField livro, livro2, livro3, code;
-	ComboBox<String> options, type;
+	ComboBox<String> options, type1,type2;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -32,6 +33,8 @@ public class Principal extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception{
+		ManipulaCSV alteracoesArquivo = new ManipulaCSV("usuarios.csv","emprestimos.csv","livros.csv");
+		
 		window = primaryStage;
 		//PAGE: Home (Imagem, texto, menu de escolha, botão ok)
 		img = new Image("http://icons.iconarchive.com/icons/itzikgur/my-seven/512/Books-1-icon.png");
@@ -81,8 +84,12 @@ public class Principal extends Application {
 		
 		msgCadUser = new Label();
 		
+		type2 = new ComboBox<>();
+		type2.getItems().addAll("Usuario", "Professor", "Comunidade");
+		type2.setPromptText("TIPO DO USUARIO");
+		
 		confirm = new Button("CONFIRMAR");
-		confirm.setOnAction(e -> cadastrarUsuario(name.getText(), doc.getText()));
+		confirm.setOnAction(e -> cadastrarUsuario(name.getText(), doc.getText(),type2.getValue(), alteracoesArquivo));
 		
 		back = new Button("VOLTAR");
 		back.setOnAction(e -> {
@@ -92,7 +99,7 @@ public class Principal extends Application {
 		});
 		
 		VBox layoutCadUser = new VBox(20);
-		layoutCadUser.getChildren().addAll(textCadUser, name, doc, msgCadUser, confirm, back);
+		layoutCadUser.getChildren().addAll(textCadUser, name, doc,type2, msgCadUser, confirm, back);
 		layoutCadUser.setAlignment(Pos.CENTER);
 		
 		//PAGE: Cadastro livro (campo nome, campo tipo, campo codigo, botao ok e voltar)
@@ -106,14 +113,14 @@ public class Principal extends Application {
 		code = new TextField();
 		code.setPromptText("CÓDIGO");
 		
-		type = new ComboBox<>();
-		type.getItems().addAll("Texto", "Geral");
-		type.setPromptText("TIPO");
+		type1 = new ComboBox<>();
+		type1.getItems().addAll("Texto", "Geral");
+		type1.setPromptText("TIPO");
 		
 		msgCadLivro = new Label();
 		
 		confirm2 = new Button("CONFIRMAR");
-		confirm2.setOnAction(e -> cadastrarLivro(livro.getText(), code.getText(), type.getValue()));
+		confirm2.setOnAction(e -> cadastrarLivro(livro.getText(), code.getText(), type1.getValue(),alteracoesArquivo));
 		
 		back2 = new Button("VOLTAR");
 		back2.setOnAction(e -> {
@@ -123,7 +130,7 @@ public class Principal extends Application {
 		});
 		
 		VBox layoutCadLivro = new VBox(20);
-		layoutCadLivro.getChildren().addAll(textCadLivro, livro, code, type, msgCadLivro, confirm2, back2);
+		layoutCadLivro.getChildren().addAll(textCadLivro, livro, code, type1, msgCadLivro, confirm2, back2);
 		layoutCadLivro.setAlignment(Pos.CENTER);
 		
 		//Verifica se quer salvar o programa antes de fechar
@@ -161,13 +168,27 @@ public class Principal extends Application {
 		window.show();
 	}
 	
-	private void cadastrarUsuario(String nome, String cpf){
+	private void cadastrarUsuario(String nome, String cpf,String tipo, ManipulaCSV manipulador){
+		Pessoa pessoa = new Pessoa(nome,cpf);
+		ArrayList<Pessoa> pessoasArquivo = manipulador.loadUsuarios();
+		if(pessoasArquivo != null) {
+			for(Pessoa p : pessoasArquivo)
+			{
+				if(p.getCpf().equals(pessoa.getCpf()))
+				{
+					msgCadUser.setText("Cpf ja cadastrado na base de dados: " + nome + " (" + cpf + ")");
+					return;
+				}
+			}
+		}
+		manipulador.cadastrarPessoa(pessoa,tipo);
+		
 		msgCadUser.setText("Usuário cadastrado: " + nome + " (" + cpf + ")");
 		name.clear();
 		doc.clear();
 	}
 	
-	private void cadastrarLivro(String nome, String codigo, String tipo){
+	private void cadastrarLivro(String nome, String codigo, String tipo,ManipulaCSV manipulador){
 		msgCadLivro.setText("Livro cadastrado: " + nome + " (" + codigo + " / " + tipo + ")");
 		livro.clear();
 		code.clear();

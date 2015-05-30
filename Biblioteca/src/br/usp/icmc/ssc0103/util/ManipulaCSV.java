@@ -1,11 +1,14 @@
 package br.usp.icmc.ssc0103.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import br.usp.icmc.scc0103.model.*;;
 
@@ -58,6 +61,9 @@ public class ManipulaCSV {
 		ArrayList<Pessoa> listUsers = new ArrayList<Pessoa>();
 		BufferedReader leitor = null;
 		String linha;
+		File f = new File(this.nomeArquivoUsuarios);
+		if(!f.exists()) 
+			return null;
 		
 		try {
 			leitor = new BufferedReader(new FileReader(this.nomeArquivoUsuarios));
@@ -114,19 +120,49 @@ public class ManipulaCSV {
 	}
 	
 	
-	public void cadastrarUsuario(Pessoa usuario)
+	public void cadastrarPessoa(Pessoa usuario,String tipo)
 	{
-		//TODO
+		FileWriter escritor;
+		Date d = new Date();
+		Integer tipoInserido;
+		
+		if(tipo.equals("Usuario")) tipoInserido = 0;
+		else if (tipo.equals("Professor")) tipoInserido = 1;
+		else tipoInserido = 2;
+			
+		try {
+			escritor = new FileWriter(new File(this.nomeArquivoUsuarios));
+			escritor.append(tipoInserido+","+usuario.getNome()+","+usuario.getCpf()+","+d.toString());
+			escritor.close();
+		} catch (FileNotFoundException e) {
+			File f = new File(this.nomeArquivoUsuarios);
+			
+			try {
+				f.createNewFile();
+				escritor = new FileWriter(f);
+				escritor.append(tipoInserido+","+usuario.getNome()+","+usuario.getNome());
+				escritor.close();
+			} catch (IOException ex) {
+				System.out.println("erro: "+ex.getMessage());
+			}
+			
+		} catch (IOException ex) {
+			System.out.println("erro: "+ex.getMessage());
+		}
+		
 	}
 	
-	public void cadastrarEmprestimo(Pessoa usuario,Livro livro)
+	public void cadastrarEmprestimo(Emprestimo emprestimo)
 	{
-		//TODO
+		FileWriter escritor;
+		try {
+			escritor = new FileWriter(new File(this.nomeArquivoLivros));
+			//escritor.append(livro.getNome()+","+usuario.getNome());
+			escritor.close();
+		} catch (IOException ex) {
+			System.out.println("erro: "+ex.getMessage());
+		}
 	}
 	
-	public ArrayList<Livro> getLivrosPorUsuario(Pessoa user)
-	{
-		return null;
-	}
 	
 }
