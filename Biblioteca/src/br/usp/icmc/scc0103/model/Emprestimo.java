@@ -38,4 +38,11 @@ public class Emprestimo {
 		this.pessoaComLivro = pessoaComLivro;
 	}
 	
+	public boolean equals(Object e){
+		if(((Emprestimo) e).getPessoaComLivro().getCpf() == this.getPessoaComLivro().getCpf())
+			if(((Emprestimo) e).getLivroEmprestado().getCodigo() == this.getLivroEmprestado().getCodigo())
+				//if (e.dataAluguel.equals(this.dataAluguel))
+					return true;
+		return false;
+	}
 }

@@ -6,6 +6,7 @@ import java.util.Date;
 public class Pessoa {
 	private String nome; 	//nome da pessoa 
 	private String cpf;		//cpf da pessoa(primary key pra colocar no arquivo)
+	private String tipo;
 	private ArrayList<Livro> livrosEmprestados;	//lista de livros emprestados
 	private Date diaSuspensao;
 
@@ -15,6 +16,7 @@ public class Pessoa {
 		this.setNome(nome);
 		this.setDiaSuspensao(null);
 		this.setCpf(cpf);
+		this.setTipo(this.getTipo());
 		this.livrosEmprestados = new ArrayList<Livro>();
 	}
 	
@@ -23,6 +25,7 @@ public class Pessoa {
 		this.setNome(nome);
 		this.setDiaSuspensao(d);
 		this.setCpf(cpf);
+		this.setTipo(this.getTipo());
 		this.livrosEmprestados = new ArrayList<Livro>();
 	}
 		
@@ -50,6 +53,14 @@ public class Pessoa {
 		this.nome = nome;
 	}
 
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+
+	public String getTipo() {
+		return "Pessoa";
+	}
+
 	public Date getDiaSuspensao() {
 		return diaSuspensao;
 	}
@@ -69,6 +80,10 @@ public class Pessoa {
 	public boolean pegaEmprestadoLivro(Livro l){
 		this.emprestarLivro(l);
 		return true;
+	}
+	
+	public String toString(){
+		return this.getNome()+" - "+this.getCpf();
 	}
 	
 }

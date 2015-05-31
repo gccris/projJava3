@@ -25,4 +25,9 @@ public class Comunidade extends Pessoa{
 			return false;
 	}
 	
+	public String getTipo() {
+		return "Comunidade";
+	}
+
+	
 }

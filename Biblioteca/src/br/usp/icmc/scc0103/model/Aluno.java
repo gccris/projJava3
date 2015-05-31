@@ -25,4 +25,9 @@ public class Aluno extends Pessoa{
 			return false;
 	}
 	
+	public String getTipo() {
+		return "Aluno";
+	}
+
+	
 }

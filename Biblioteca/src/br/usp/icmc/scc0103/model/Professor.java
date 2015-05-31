@@ -24,4 +24,9 @@ public class Professor extends Pessoa{
 		else
 			return false;
 	}
+	
+	public String getTipo() {
+		return "Professor";
+	}
+
 }

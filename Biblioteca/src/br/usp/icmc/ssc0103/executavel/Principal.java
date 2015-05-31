@@ -1,6 +1,7 @@
 package br.usp.icmc.ssc0103.executavel;
 
 import java.util.*;
+
 import br.usp.icmc.ssc0103.util.*;
 import br.usp.icmc.scc0103.model.*;
 import javafx.application.Application;
@@ -15,7 +16,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class Principal extends Application {
-
+	ManipulaCSV alteracoesArquivo;
 	Stage window;
 	Scene home, sceneUser, sceneLivro, sceneEmprestimos;
 	Button select, addUser, addLivro, addEmp, addDev;
@@ -28,6 +29,11 @@ public class Principal extends Application {
 	TextField nameUser, nameEmp, nameDev, doc;
 	TextField bookLivro, bookEmp, bookDev, code;
 	ComboBox<String> options, typeUser, typeLivro;
+	ComboBox<Pessoa> userCombo,userComboDev;
+	ComboBox<Livro> livroCombo,livroComboDev;
+	ArrayList<Pessoa> listPessoas;
+	ArrayList<Livro> listLivros;
+	ArrayList<Emprestimo> listEmprestimos;
 	
 	TableView<Pessoa> tableUser = new TableView<>();
 	TableView<Livro> tableLivro = new TableView<>();
@@ -42,8 +48,12 @@ public class Principal extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception{
-		//ManipulaCSV alteracoesArquivo = new ManipulaCSV("usuarios.csv","emprestimos.csv","livros.csv");
+		alteracoesArquivo = new ManipulaCSV("usuarios.csv","emprestimos.csv","livros.csv");
 		//toObsList(alteracoesArquivo);
+		
+		listPessoas = alteracoesArquivo.loadUsuarios();
+		listLivros = alteracoesArquivo.loadLivros();
+		listEmprestimos = alteracoesArquivo.loadEmprestimos(listPessoas, listLivros);
 		
 		window = primaryStage;
 		
@@ -97,17 +107,18 @@ public class Principal extends Application {
 		TableColumn tcTypeUser = new TableColumn("TIPO");
 		tcTypeUser.setMinWidth(100);
 		tcTypeUser.setMaxWidth(100);
-		//tcTypeUser.setCellValueFactory(
-		//		new PropertyValueFactory<>("tipo"));      // TODO PEGAR NOME DA CLASSE
+		tcTypeUser.setCellValueFactory(
+				new PropertyValueFactory<>("tipo"));
 		
 		TableColumn tcBanUser = new TableColumn("SUSPENSÃO");
 		tcBanUser.setMinWidth(100);
-		tcBanUser.setMaxWidth(100);
+		tcBanUser.setMaxWidth(200);
 		tcBanUser.setCellValueFactory(
 				new PropertyValueFactory<>("diaSuspensao"));
 		
 		tableUser.getColumns().addAll(tcNameUser, tcDocUser, tcTypeUser, tcBanUser);
 		tableUser.setItems(dataUser);
+
 		
 		textAddUser = new Label("Novo usuário:");
 		textAddUser.setFont(new Font(16));
@@ -228,33 +239,39 @@ public class Principal extends Application {
 		textAddEmp = new Label("Novo empréstimo:");
 		textAddEmp.setFont(new Font(16));
 		
-		nameEmp = new TextField();
-		nameEmp.setPromptText("USUÁRIO");
+		userCombo = new ComboBox<>();
+		userCombo.setOnAction((event) -> {
+				loadLivrosNaoAlugados();
+		});
 		
-		bookEmp = new TextField();
-		bookEmp.setPromptText("LIVRO");
+		livroCombo = new ComboBox<>();
 		
-		addEmp = new Button("ADD");
-		addEmp.setOnAction(e -> emprestarLivro(nameEmp.getText(), bookEmp.getText()));
+		userCombo.setVisibleRowCount(5);
+		livroCombo.setVisibleRowCount(5);
+		addEmp = new Button("Empréstimo");
+		addEmp.setOnAction(e -> emprestarLivro(userCombo.getValue(), livroCombo.getValue()));
 		
 		HBox hbEmp = new HBox(3);
-		hbEmp.getChildren().addAll(nameEmp, bookEmp, addEmp);
+		hbEmp.getChildren().addAll(userCombo, livroCombo, addEmp);
 		hbEmp.setAlignment(Pos.CENTER);
 		
 		textAddDev = new Label("Devolução:");
 		textAddDev.setFont(new Font(16));
 		
-		nameDev = new TextField();
-		nameDev.setPromptText("USUÁRIO");
+		userComboDev = new ComboBox<>();
+		userComboDev.setOnAction((event) -> {
+				loadLivrosUsuario(userComboDev.getValue());
+		});
 		
-		bookDev = new TextField();
-		bookDev.setPromptText("LIVRO");
+		livroComboDev = new ComboBox<>();
 		
-		addDev = new Button("ADD");
-		addDev.setOnAction(e -> devolverLivro(nameDev.getText(), bookDev.getText()));
+		userComboDev.setVisibleRowCount(5);
+		livroComboDev.setVisibleRowCount(5);
+		addDev = new Button("Devolução");
+		addDev.setOnAction(e -> devolverLivro(userComboDev.getValue(), livroComboDev.getValue()));
 		
 		HBox hbDev = new HBox(3);
-		hbDev.getChildren().addAll(nameDev, bookDev, addDev);
+		hbDev.getChildren().addAll(userComboDev, livroComboDev, addDev);
 		hbDev.setAlignment(Pos.CENTER);
 		
 		
@@ -262,8 +279,10 @@ public class Principal extends Application {
 		
 		backEmprestimos = new Button("VOLTAR");
 		backEmprestimos.setOnAction(e -> {
-			nameDev.clear();
-			bookEmp.clear();
+			userCombo.setValue(null);
+			userComboDev.setValue(null);
+			livroCombo.setValue(null);
+			livroComboDev.setValue(null);
 			window.setScene(home);
 		});
 		
@@ -278,11 +297,12 @@ public class Principal extends Application {
 			fecharPrograma();
 		});
 		
+		atualizaListUser();
+		atualizaListLivro();
 		home = new Scene(layoutHome, 500, 650);
 		sceneUser = new Scene(layoutUser, 500, 650);
 		sceneLivro = new Scene(layoutLivro, 500, 650);
 		sceneEmprestimos = new Scene(layoutEmprestimos, 500, 650);
-		
 		window.setScene(home);
 		window.setTitle("BIBLIOTECA DOS PARÇA");
 		window.show();
@@ -290,55 +310,112 @@ public class Principal extends Application {
 	
 	// Método cadastro de usuário
 	private void cadastrarUsuario(String nome, String cpf, String tipo){
-		
-		// TODO
-		
-		msgAddUser.setText("Usuário cadastrado: " + nome + " (" + cpf + ")");
-		nameUser.clear();
-		doc.clear();
+		Pessoa novo = GerenciaBiblioteca.findPessoaPorCPF(listPessoas, cpf);
+		if (novo == null){
+			if (tipo.compareTo("Aluno") == 0)
+				novo = new Aluno(nome,cpf);
+			if (tipo.compareTo("Professor") == 0)
+			    novo = new Professor(nome,cpf);
+			if (tipo.compareTo("Comunidade")== 0)
+				novo = new Comunidade(nome,cpf);
+			
+			listPessoas.add(novo);
+			atualizaListUser();
+			msgAddUser.setText("Usuário cadastrado: " + nome + " (" + cpf + ")");
+			nameUser.clear();
+			doc.clear();
+		}
+		else
+			msgAddUser.setText("CPF:"+ cpf + " já cadastrado!");
 	}
 	
 	// Método cadastro de livro
 	private void cadastrarLivro(String nome, String codigo, String tipo){
-		
-		// TODO
-		
-		msgAddLivro.setText("Livro cadastrado: " + nome + " (" + codigo + " / " + tipo + ")");
-		bookLivro.clear();
-		code.clear();
+		Livro novo = GerenciaBiblioteca.findLivroPorCodigo(listLivros, codigo);
+		if (novo == null){
+			novo = new Livro(tipo,nome,codigo);
+			listLivros.add(novo);
+			atualizaListLivro();
+			msgAddLivro.setText("Livro cadastrado: " + nome + " (" + codigo + " / " + tipo + ")");
+			bookLivro.clear();
+			code.clear();
+		}
+		else
+			msgAddLivro.setText("Codigo:"+ codigo +" já cadastrado!");
 	}
 	
 	// Método cadastro emprestimo
-	private void emprestarLivro(String user, String livro){
-		
-		// TODO
-		
+	private void emprestarLivro(Pessoa user, Livro livro){
+		if (userCombo.getValue() == null && livroCombo.getValue() == null){
+			msgEmp.setText("Selecione uma pessoa/livro para empréstimo.");
+			return;
+		}
+		if(livro.getTipo().compareTo("texto") == 0 && user.getTipo().compareTo("comunidade") == 0){
+			msgEmp.setText("Esta pessoa não pode pegar esse tipo de livro.");
+			return;
+		}
+		Date d = new Date();//TODO
+		Emprestimo novo = new Emprestimo(livro, user, d);
+		user.getLivrosEmprestados().add(livro);
+		listEmprestimos.add(novo);
+		atualizaListEmprestimo();
 		msgEmp.setText("Empréstimo do livro '" + livro + "' para " + user + " efetuado!");
-		nameEmp.clear();
-		bookEmp.clear();
+		userCombo.setValue(null);
+		livroCombo.setValue(null);
 	}
 	
 	// Método cadastro devolução
-	private void devolverLivro(String user, String livro){
-		
-		// TODO
-		
+	private void devolverLivro(Pessoa user, Livro livro){
+		if (userComboDev.getValue() == null && livroComboDev.getValue() == null){
+			msgEmp.setText("Selecione uma pessoa/livro para empréstimo.");
+			return;
+		}
+		Date d = new Date();//TODO
+		Emprestimo aRemover = new Emprestimo(livro, user, d);
+		listEmprestimos.remove(aRemover);
+		atualizaListEmprestimo();
 		msgEmp.setText("Devolução do livro '" + livro + "' de " + user + " efetuada!");
-		nameDev.clear();
-		bookDev.clear();
+		userComboDev.setValue(null);
+		livroComboDev.setValue(null);
 	}
 	
-	/* Transfere a ArrayList de usuarios, livros e emprestimos para ObservableList 
-	private void toObsList(ManipulaCSV manipulador){
-		ArrayList<Pessoa> listUser = manipulador.loadUsuarios();
-		ArrayList<Livro> listLivro = manipulador.loadLivros();
-		for(Pessoa p: listUser){
+	private void atualizaListUser(){
+		dataUser.clear();
+		userCombo.getItems().clear();
+		userComboDev.getItems().clear();
+		for (Pessoa p:listPessoas){
 			dataUser.add(p);
+			userCombo.getItems().add(p);
+			userComboDev.getItems().add(p);
 		}
-		for(Livro l: listLivro){
+	}
+	
+	private void atualizaListLivro(){
+		dataLivro.clear();
+		for (Livro l:listLivros)
 			dataLivro.add(l);
-		}
-	}*/
+	}
+	
+	private void atualizaListEmprestimo(){
+		dataEmprestimo.clear();
+		for(Emprestimo e:listEmprestimos)
+			dataEmprestimo.add(e);
+	}	
+	
+	private void loadLivrosUsuario(Pessoa p){
+		livroComboDev.getItems().clear();
+		if (p == null)
+			return;
+		for (Livro l:p.getLivrosEmprestados())
+			livroComboDev.getItems().add(l);
+	}
+	
+	private void loadLivrosNaoAlugados(){
+		livroCombo.getItems().clear();
+		ArrayList<Livro> livrosNaoAlugados = GerenciaBiblioteca.findLivrosNaoAlugados(listLivros, listEmprestimos);
+		for(Livro l : livrosNaoAlugados)
+			livroCombo.getItems().add(l);
+	}
 	
 	// Método chama ConfirmBox para salvar o programa antes de fechar
 	private void fecharPrograma(){
@@ -354,7 +431,7 @@ public class Principal extends Application {
 	// Método para salvar alterações no CSV
 	private void salvarPrograma(){
 		
-		// TODO
+	alteracoesArquivo.cadastrarPessoa(listPessoas);
 		
 		System.out.println("As alterações foram salvas!");
 	}

@@ -69,7 +69,7 @@ public class ManipulaCSV {
 			leitor = new BufferedReader(new FileReader(this.nomeArquivoUsuarios));
 			while((linha = leitor.readLine()) != null){
 				String[] user = linha.split(",");
-				Date d = new Date(user[3]);
+				Date d = new Date();//new Date(user[3]);
 				if((user[0].compareTo("0")) == 0){//aluno
 					Aluno a = new Aluno(user[1],user[2],d);
 					listUsers.add(a);
@@ -120,27 +120,36 @@ public class ManipulaCSV {
 	}
 	
 	
-	public void cadastrarPessoa(Pessoa usuario,String tipo)
+	public void cadastrarPessoa(ArrayList<Pessoa> listPessoas)
 	{
 		FileWriter escritor;
 		Date d = new Date();
 		Integer tipoInserido;
 		
-		if(tipo.equals("Usuario")) tipoInserido = 0;
-		else if (tipo.equals("Professor")) tipoInserido = 1;
-		else tipoInserido = 2;
+
 			
 		try {
 			escritor = new FileWriter(new File(this.nomeArquivoUsuarios));
-			escritor.append(tipoInserido+","+usuario.getNome()+","+usuario.getCpf()+","+d.toString());
-			escritor.close();
+			for(Pessoa p:listPessoas){
+				if(p.getTipo().compareTo("Aluno") == 0) tipoInserido = 0;
+				else if (p.getTipo().compareTo("Professor") == 0) tipoInserido = 1;
+				else tipoInserido = 2;
+				escritor.append(tipoInserido+","+p.getNome()+","+p.getCpf()+","+d.toString()+'\n');
+			}
+				escritor.close();
+				
 		} catch (FileNotFoundException e) {
 			File f = new File(this.nomeArquivoUsuarios);
 			
 			try {
 				f.createNewFile();
 				escritor = new FileWriter(f);
-				escritor.append(tipoInserido+","+usuario.getNome()+","+usuario.getNome());
+				for(Pessoa p:listPessoas){
+					if(p.equals("Aluno")) tipoInserido = 0;
+					else if (p.equals("Professor")) tipoInserido = 1;
+					else tipoInserido = 2;
+					escritor.append(tipoInserido+","+p.getNome()+","+p.getCpf()+","+d.toString()+'\n');
+				}
 				escritor.close();
 			} catch (IOException ex) {
 				System.out.println("erro: "+ex.getMessage());

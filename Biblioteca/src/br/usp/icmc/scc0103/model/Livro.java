@@ -8,16 +8,16 @@ public class Livro {
 	
 	public Livro(String tipo,String nome,String codigo) {
 		super();
-		this.setTipoLivro(tipo);
+		this.setTipo(tipo);
 		this.setCodigo(codigo);
 		this.setNome(nome);
 	}
 	
-	public String getTipoLivro() {
+	public String getTipo() {
 		return this.tipo;
 	}
 	
-	public void setTipoLivro(String tipo){
+	public void setTipo(String tipo){
 		this.tipo = tipo;
 	}
 
@@ -37,4 +37,7 @@ public class Livro {
 		this.nome = nome;
 	}
 	
+	public String toString(){
+		return this.getNome() +" - "+ this.getCodigo();
+	}
 }
