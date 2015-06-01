@@ -5,6 +5,10 @@ import java.util.Date;
 
 import javax.swing.JSpinner.DateEditor;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Hours;
+
 import br.usp.icmc.scc0103.model.Emprestimo;
 import br.usp.icmc.scc0103.model.Livro;
 import br.usp.icmc.scc0103.model.Pessoa;
@@ -106,14 +110,25 @@ public class GerenciaBiblioteca {
 	
 	//calcula o tempo atrasado do usuario
 	public static int calculaTempoAtrasado(Emprestimo e,Date dataAtual){
-		long diff = dataAtual.getTime() - e.getDataAluguel().getTime();
-		return (int)diff;
+		DateTime dtAtual = new DateTime(dataAtual);
+		DateTime dtSuspenso = new DateTime(e.getDataDevolucao());
+		int dias = Days.daysBetween(dtSuspenso,dtAtual).getDays();
+		if(dtSuspenso.getDayOfMonth() - dtAtual.getDayOfMonth() != 0)
+			dias++;
+		return dias;
 	}
 	
 	//suspende usuario por determinado tempo
 	public static void suspendeUsuario(Pessoa p,Date dataAtual,int diasAtraso){
-		Date dataSuspensao = new Date();
-		dataSuspensao.setTime(dataAtual.getTime() + diasAtraso * 24 * 60 * 60 * 1000);
-		p.setDiaSuspensao(dataSuspensao);
+		dataAtual.setDate(dataAtual.getDate()+diasAtraso);
+		p.setDiaSuspensao(dataAtual);
+	}
+	
+	public static Emprestimo findEmprestimo(Pessoa p,Livro l,ArrayList<Emprestimo> listEmprestimos){
+		for(Emprestimo e:listEmprestimos){
+			if(e.getPessoaComLivro().getCpf().compareTo(p.getCpf()) == 0 && e.getLivroEmprestado().getCodigo().compareTo(l.getCodigo())==0)
+				return e;
+		}
+		return null;
 	}
 }

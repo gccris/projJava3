@@ -63,7 +63,6 @@ public class Emprestimo {
 			return false;
 		if(((Emprestimo) e).getPessoaComLivro().getCpf() == this.getPessoaComLivro().getCpf())
 			if(((Emprestimo) e).getLivroEmprestado().getCodigo() == this.getLivroEmprestado().getCodigo())
-				//if (e.dataAluguel.equals(this.dataAluguel))
 					return true;
 		return false;
 	}

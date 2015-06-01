@@ -40,4 +40,14 @@ public class Livro {
 	public String toString(){
 		return this.getNome() +" - "+ this.getCodigo();
 	}
+	
+	public boolean equals(Object e){
+		if (e == null)
+			return false;
+		if(((Livro) e).getCodigo().compareTo(this.getCodigo()) == 0)
+			if(((Livro) e).getNome().compareTo(this.getNome()) == 0)
+				if(((Livro) e).getTipo().compareTo(this.getTipo()) == 0)
+					return true;
+		return false;
+	}
 }

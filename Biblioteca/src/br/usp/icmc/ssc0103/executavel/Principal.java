@@ -1,7 +1,11 @@
 package br.usp.icmc.ssc0103.executavel;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
+
+import javax.swing.JOptionPane;
 
 import br.usp.icmc.ssc0103.util.*;
 import br.usp.icmc.scc0103.model.*;
@@ -92,7 +96,7 @@ public class Principal extends Application {
 		dataPicker.setOnAction(e -> {
 			dataAtualPrograma.setDate(dataPicker.getValue().getDayOfMonth()); 
 			dataAtualPrograma.setMonth(dataPicker.getValue().getMonthValue()-1);
-			dataAtualPrograma.setYear(dataPicker.getValue().getYear());
+			dataAtualPrograma.setYear(dataPicker.getValue().getYear()-1900);
 		});
 		VBox layoutHome = new VBox(30);
 		layoutHome.getChildren().addAll(imgView, textHome, options, select,dataPicker);
@@ -120,11 +124,28 @@ public class Principal extends Application {
 		tcTypeUser.setCellValueFactory(
 				new PropertyValueFactory<>("tipo"));
 		
-		TableColumn tcBanUser = new TableColumn("SUSPENSÃO");
+		TableColumn<Pessoa,Date> tcBanUser = new TableColumn("SUSPENSÃO");
 		tcBanUser.setMinWidth(100);
 		tcBanUser.setMaxWidth(200);
 		tcBanUser.setCellValueFactory(
 				new PropertyValueFactory<>("diaSuspensao"));
+		tcBanUser.setCellFactory(column -> {
+		    return new TableCell<Pessoa,Date>() {
+		        @Override
+		        protected void updateItem(Date item, boolean empty) {
+		            super.updateItem(item, empty);
+
+		            if (item == null || empty) {
+		                setText(null);
+		                setStyle("");
+		            } else {
+		            	DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		                setText(df.format(item));
+		            }
+		        }
+		    };
+		});
+		
 		
 		tableUser.getColumns().addAll(tcNameUser, tcDocUser, tcTypeUser, tcBanUser);
 		tableUser.setItems(dataUser);
@@ -237,17 +258,49 @@ public class Principal extends Application {
 		tcUserEmp.setCellValueFactory(
 				new PropertyValueFactory<>("pessoaComLivro"));
 		
-		TableColumn tcDateEmp = new TableColumn("DATA");
+		TableColumn<Emprestimo,Date> tcDateEmp = new TableColumn("DATA");
 		tcDateEmp.setMinWidth(100);
 		tcDateEmp.setMaxWidth(200);
 		tcDateEmp.setCellValueFactory(
 				new PropertyValueFactory<>("dataAluguel"));
+		tcDateEmp.setCellFactory(column -> {
+		    return new TableCell<Emprestimo,Date>() {
+		        @Override
+		        protected void updateItem(Date item, boolean empty) {
+		            super.updateItem(item, empty);
+
+		            if (item == null || empty) {
+		                setText(null);
+		                setStyle("");
+		            } else {
+		            	DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		                setText(df.format(item));
+		            }
+		        }
+		    };
+		});
 		
-		TableColumn tcDateEmpDevolucao = new TableColumn("DATA DEVOLUCAO");
+		TableColumn<Emprestimo,Date> tcDateEmpDevolucao = new TableColumn("DATA DEVOLUCAO");
 		tcDateEmpDevolucao.setMinWidth(100);
 		tcDateEmpDevolucao.setMaxWidth(200);
 		tcDateEmpDevolucao.setCellValueFactory(
 				new PropertyValueFactory<>("dataDevolucao"));
+		tcDateEmpDevolucao.setCellFactory(column -> {
+		    return new TableCell<Emprestimo,Date>() {
+		        @Override
+		        protected void updateItem(Date item, boolean empty) {
+		            super.updateItem(item, empty);
+
+		            if (item == null || empty) {
+		                setText(null);
+		                setStyle("");
+		            } else {
+		            	DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		                setText(df.format(item));
+		            }
+		        }
+		    };
+		});
 		
 		tableEmprestimo.getColumns().addAll(tcBookEmp, tcUserEmp, tcDateEmp,tcDateEmpDevolucao);
 		tableEmprestimo.setItems(dataEmprestimo);		
@@ -311,7 +364,7 @@ public class Principal extends Application {
 			window.setScene(home);
 		});
 		
-		VBox layoutEmprestimos = new VBox(6);
+		VBox layoutEmprestimos = new VBox(8);
 		layoutEmprestimos.getChildren().addAll(textEmprestimos, tableEmprestimo,hbAtrasados, textAddEmp, hbEmp,
 				textAddDev, hbDev, msgEmp, backEmprestimos);
 		layoutEmprestimos.setAlignment(Pos.TOP_CENTER);
@@ -380,8 +433,15 @@ public class Principal extends Application {
 			return;
 		}
 		Date d = (Date) dataAtualPrograma.clone();
+		if(user.estaSuspenso(d)){
+			msgEmp.setText("Esta pessoa está suspensa.");
+			return;
+		}
+		if(!user.pegaEmprestadoLivro(livro)){
+			msgEmp.setText("Esta pessoa já está com muitos livros");
+			return;
+		}
 		Emprestimo novo = new Emprestimo(livro, user, d);
-		user.getLivrosEmprestados().add(livro);
 		listEmprestimos.add(novo);
 		atualizaListEmprestimo();
 		msgEmp.setText("Empréstimo do livro '" + livro + "' para " + user + " efetuado!");
@@ -396,7 +456,13 @@ public class Principal extends Application {
 			return;
 		}
 		Date d = (Date) dataAtualPrograma.clone();
-		Emprestimo aRemover = new Emprestimo(livro, user, d);
+		Emprestimo aRemover = GerenciaBiblioteca.findEmprestimo(user, livro, listEmprestimos);
+		int diasAtrasados = GerenciaBiblioteca.calculaTempoAtrasado(aRemover, d);
+		if (diasAtrasados > 0){
+			GerenciaBiblioteca.suspendeUsuario(user, d, diasAtrasados);
+			JOptionPane.showMessageDialog(null, "Usuário suspenso por: "+diasAtrasados+" dias");
+		}
+		user.devolverLivro(livro);
 		listEmprestimos.remove(aRemover);
 		atualizaListEmprestimo();
 		msgEmp.setText("Devolução do livro '" + livro + "' de " + user + " efetuada!");

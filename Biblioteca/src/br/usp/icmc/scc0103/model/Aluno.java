@@ -10,15 +10,9 @@ public class Aluno extends Pessoa{
 		super(nome,cpf,d);
 	}
 	
-	public boolean estaSuspenso(Date diaAtual){
-		if(getDiaSuspensao().compareTo(diaAtual) < 0)
-			return false;
-		return true;
-	}
-	
 	public boolean pegaEmprestadoLivro(Livro l){
 		if(getLivrosEmprestados().size()<4){
-			emprestarLivro(l);
+			this.getLivrosEmprestados().add(l);
 			return true;
 		}
 		else

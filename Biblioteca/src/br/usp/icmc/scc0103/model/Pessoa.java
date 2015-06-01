@@ -14,7 +14,8 @@ public class Pessoa {
 	public Pessoa(String nome,String cpf) {
 		super();
 		this.setNome(nome);
-		this.setDiaSuspensao(null);
+		this.diaSuspensao = new Date();
+		this.diaSuspensao.setYear(this.diaSuspensao.getYear()-this.diaSuspensao.getYear());//coloca numa data muito antiga
 		this.setCpf(cpf);
 		this.setTipo(this.getTipo());
 		this.livrosEmprestados = new ArrayList<Livro>();
@@ -34,15 +35,17 @@ public class Pessoa {
 	}
 
 	protected void emprestarLivro(Livro l){
-		livrosEmprestados.add(l);
+		this.livrosEmprestados.add(l);
 	}
 	
-	public void devolverLivro(int indice){
-		livrosEmprestados.remove(indice);
+	public boolean estaSuspenso(Date diaAtual){
+		if(getDiaSuspensao().after(diaAtual))
+			return true;
+		return false;
 	}
 	
 	public void devolverLivro(Livro l){
-		livrosEmprestados.remove(l);
+		this.livrosEmprestados.remove(l);
 	}
 
 	public String getNome() {

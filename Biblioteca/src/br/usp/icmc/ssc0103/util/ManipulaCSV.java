@@ -6,6 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -69,7 +72,9 @@ public class ManipulaCSV {
 			leitor = new BufferedReader(new FileReader(this.nomeArquivoUsuarios));
 			while((linha = leitor.readLine()) != null){
 				String[] user = linha.split(",");
-				Date d = new Date();//new Date(user[3]);
+				Date d = new Date();
+				DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+				d = df.parse(user[3]);
 				if((user[0].compareTo("0")) == 0){//aluno
 					Aluno a = new Aluno(user[1],user[2],d);
 					listUsers.add(a);
@@ -87,6 +92,9 @@ public class ManipulaCSV {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -134,7 +142,9 @@ public class ManipulaCSV {
 				if(p.getTipo().compareTo("Aluno") == 0) tipoInserido = 0;
 				else if (p.getTipo().compareTo("Professor") == 0) tipoInserido = 1;
 				else tipoInserido = 2;
-				escritor.append(tipoInserido+","+p.getNome()+","+p.getCpf()+","+d.toString()+'\n');
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				String data = dateFormat.format(p.getDiaSuspensao());
+				escritor.append(tipoInserido+","+p.getNome()+","+p.getCpf()+","+data+'\n');
 			}
 				escritor.close();
 				
@@ -148,7 +158,9 @@ public class ManipulaCSV {
 					if(p.equals("Aluno")) tipoInserido = 0;
 					else if (p.equals("Professor")) tipoInserido = 1;
 					else tipoInserido = 2;
-					escritor.append(tipoInserido+","+p.getNome()+","+p.getCpf()+","+d.toString()+'\n');
+					SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+					String data = dateFormat.format(p.getDiaSuspensao());
+					escritor.append(tipoInserido+","+p.getNome()+","+p.getCpf()+","+data+'\n');
 				}
 				escritor.close();
 			} catch (IOException ex) {
