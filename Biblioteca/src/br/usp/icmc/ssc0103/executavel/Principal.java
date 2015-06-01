@@ -58,6 +58,7 @@ public class Principal extends Application {
 		alteracoesArquivo = new ManipulaCSV("usuarios.csv","emprestimos.csv","livros.csv");
 		//toObsList(alteracoesArquivo);
 		
+		//carrega as listas de usuário, livro e empréstimos
 		listPessoas = alteracoesArquivo.loadUsuarios();
 		listLivros = alteracoesArquivo.loadLivros();
 		listEmprestimos = alteracoesArquivo.loadEmprestimos(listPessoas, listLivros);
@@ -74,6 +75,7 @@ public class Principal extends Application {
 		textHome = new Label("Sistema para Bibliotecas");
 		textHome.setFont(new Font(30));
 		
+		HBox hbPrinc = new HBox(2);
 		options = new ComboBox<>();
 		options.getItems().addAll("Usuários", "Livros", "Emprestimos");
 		options.setPromptText("Selecione uma opção");
@@ -81,15 +83,25 @@ public class Principal extends Application {
 		select = new Button("SELECIONAR");
 		select.setOnAction(e -> {
 			if(options.getValue() == "Usuários"){
+				atualizaListUser();
 				window.setScene(sceneUser);
 			}
 			if(options.getValue() == "Livros"){
+				atualizaListLivro();
 				window.setScene(sceneLivro);
 			}
 			if(options.getValue() == "Emprestimos"){
+				atualizaListEmprestimo();
+				atualizaListUser();
 				window.setScene(sceneEmprestimos);
 			}
 		});
+		hbPrinc.getChildren().addAll(options,select);
+		hbPrinc.setAlignment(Pos.CENTER);
+		
+		HBox hbData = new HBox(2);
+		Label lblData = new Label();
+		lblData.setText("Data do sistema:   ");
 		DatePicker dataPicker = new DatePicker();
 		dataPicker.setValue(dataAtualPrograma.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		dataPicker.setEditable(false);
@@ -98,8 +110,11 @@ public class Principal extends Application {
 			dataAtualPrograma.setMonth(dataPicker.getValue().getMonthValue()-1);
 			dataAtualPrograma.setYear(dataPicker.getValue().getYear()-1900);
 		});
+		hbData.getChildren().addAll(lblData,dataPicker);
+		hbData.setAlignment(Pos.CENTER);
+		
 		VBox layoutHome = new VBox(30);
-		layoutHome.getChildren().addAll(imgView, textHome, options, select,dataPicker);
+		layoutHome.getChildren().addAll(imgView, textHome, hbPrinc,hbData);
 		layoutHome.setAlignment(Pos.CENTER);
 		
 		//PAGE: Usuários (Tabela(Lista), campos para cadastro, botao add)
@@ -139,8 +154,12 @@ public class Principal extends Application {
 		                setText(null);
 		                setStyle("");
 		            } else {
-		            	DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-		                setText(df.format(item));
+		            	if(item.before(dataAtualPrograma))
+		                	setText("");
+		            	else{
+		            		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		            		setText(df.format(item));
+		            	}
 		            }
 		        }
 		    };
@@ -150,6 +169,20 @@ public class Principal extends Application {
 		tableUser.getColumns().addAll(tcNameUser, tcDocUser, tcTypeUser, tcBanUser);
 		tableUser.setItems(dataUser);
 
+		HBox hbSalvarUser = new HBox(1);
+		Image imgSalvarUser = new Image("http://icon-icons.com/icons2/9/PNG/16/diskette_save_saveas_1514.png");
+		Button btnSalvarUser = new Button();
+		btnSalvarUser.setGraphic(new ImageView(imgSalvarUser));
+		btnSalvarUser.setMinSize(18, 18);
+		btnSalvarUser.setMaxSize(22, 22);
+		btnSalvarUser.setTooltip(new Tooltip("Salvar usuários no arquivo CSV"));
+		btnSalvarUser.setOnAction(e -> {
+			alteracoesArquivo.cadastrarPessoa(listPessoas);
+			JOptionPane.showMessageDialog(null, "Usuários salvos com sucesso.");
+		});
+		
+		hbSalvarUser.getChildren().addAll(btnSalvarUser);
+		hbSalvarUser.setAlignment(Pos.CENTER_RIGHT);
 		
 		textAddUser = new Label("Novo usuário:");
 		textAddUser.setFont(new Font(16));
@@ -175,13 +208,14 @@ public class Principal extends Application {
 		
 		backUser = new Button("VOLTAR");
 		backUser.setOnAction(e -> {
+			msgAddUser.setText("");
 			doc.clear();
 			nameUser.clear();
 			window.setScene(home);
 		});
 	
 		VBox layoutUser = new VBox(7);
-		layoutUser.getChildren().addAll(textUser, tableUser, textAddUser, hbUser, msgAddUser, backUser);
+		layoutUser.getChildren().addAll(textUser, tableUser, hbSalvarUser,textAddUser, hbUser, msgAddUser, backUser);
 		layoutUser.setAlignment(Pos.TOP_CENTER);
 		
 		//PAGE: Livros (tabela(lista), campos para cadastro, botao add)
@@ -209,6 +243,16 @@ public class Principal extends Application {
 		tableLivro.getColumns().addAll(tcNameLivro, tcCodeLivro, tcTypeLivro);
 		tableLivro.setItems(dataLivro);
 		
+		HBox hbSalvar = new HBox();
+		Image imgSalvarLivro = new Image("http://icon-icons.com/icons2/9/PNG/16/diskette_save_saveas_1514.png");
+		Button btnSalvarLivro = new Button();
+		btnSalvarLivro.setGraphic(new ImageView(imgSalvarLivro));
+		btnSalvarLivro.setMinSize(18, 18);
+		btnSalvarLivro.setMaxSize(22, 22);
+		btnSalvarLivro.setTooltip(new Tooltip("Salvar livros no arquivo CSV"));
+		hbSalvar.getChildren().addAll(btnSalvarLivro);
+		hbSalvar.setAlignment(Pos.CENTER_RIGHT);
+		
 		textAddLivro = new Label("Novo livro:");
 		textAddLivro.setFont(new Font(16));
 		
@@ -233,13 +277,14 @@ public class Principal extends Application {
 		
 		backLivro = new Button("VOLTAR");
 		backLivro.setOnAction(e -> {
+			msgAddLivro.setText("");
 			bookLivro.clear();
 			code.clear();
 			window.setScene(home);
 		});
 		
 		VBox layoutLivro = new VBox(7);
-		layoutLivro.getChildren().addAll(textLivro, tableLivro, textAddLivro, hbLivro, msgAddLivro, backLivro);
+		layoutLivro.getChildren().addAll(textLivro, tableLivro, hbSalvar,textAddLivro, hbLivro, msgAddLivro, backLivro);
 		layoutLivro.setAlignment(Pos.TOP_CENTER);
 		
 		//PAGE: Emprestar livro (campo usuario, campo livro/codigo)
@@ -310,8 +355,15 @@ public class Principal extends Application {
 		chkAtrasado.setOnAction((event) -> {
 			carregaAtrasados(chkAtrasado.isSelected());
 		});
+		Image imgSalvar = new Image("http://icon-icons.com/icons2/9/PNG/16/diskette_save_saveas_1514.png");
+		Button btnSalvar = new Button();
+		btnSalvar.setGraphic(new ImageView(imgSalvar));
+		btnSalvar.setMinSize(18, 18);
+		btnSalvar.setMaxSize(22, 22);
+		btnSalvar.setTooltip(new Tooltip("Salvar empréstimos no arquivo CSV"));
+		
 		HBox hbAtrasados = new HBox(2);
-		hbAtrasados.getChildren().addAll(textAtrasado,chkAtrasado);
+		hbAtrasados.getChildren().addAll(textAtrasado,chkAtrasado,btnSalvar);
 		hbAtrasados.setAlignment(Pos.CENTER_RIGHT);
 		
 		textAddEmp = new Label("Novo empréstimo:");
@@ -357,6 +409,7 @@ public class Principal extends Application {
 		
 		backEmprestimos = new Button("VOLTAR");
 		backEmprestimos.setOnAction(e -> {
+			msgEmp.setText("");
 			userCombo.setValue(null);
 			userComboDev.setValue(null);
 			livroCombo.setValue(null);
@@ -364,7 +417,7 @@ public class Principal extends Application {
 			window.setScene(home);
 		});
 		
-		VBox layoutEmprestimos = new VBox(8);
+		VBox layoutEmprestimos = new VBox(5);
 		layoutEmprestimos.getChildren().addAll(textEmprestimos, tableEmprestimo,hbAtrasados, textAddEmp, hbEmp,
 				textAddDev, hbDev, msgEmp, backEmprestimos);
 		layoutEmprestimos.setAlignment(Pos.TOP_CENTER);
@@ -375,8 +428,6 @@ public class Principal extends Application {
 			fecharPrograma();
 		});
 		
-		atualizaListUser();
-		atualizaListLivro();
 		home = new Scene(layoutHome, 500, 650);
 		sceneUser = new Scene(layoutUser, 500, 650);
 		sceneLivro = new Scene(layoutLivro, 500, 650);
@@ -470,6 +521,8 @@ public class Principal extends Application {
 		livroComboDev.setValue(null);
 	}
 	
+	
+	//atualiza a lista de usuarios
 	private void atualizaListUser(){
 		dataUser.clear();
 		userCombo.getItems().clear();
@@ -481,18 +534,21 @@ public class Principal extends Application {
 		}
 	}
 	
+	//atualiza lista de livros
 	private void atualizaListLivro(){
 		dataLivro.clear();
 		for (Livro l:listLivros)
 			dataLivro.add(l);
 	}
 	
+	//atualiza lista de emprestimos
 	private void atualizaListEmprestimo(){
 		dataEmprestimo.clear();
 		for(Emprestimo e:listEmprestimos)
 			dataEmprestimo.add(e);
 	}	
 	
+	//load dos livros que o usuario pegou para adicionar no combobox de devolucao
 	private void loadLivrosUsuario(Pessoa p){
 		livroComboDev.getItems().clear();
 		if (p == null)
@@ -501,6 +557,7 @@ public class Principal extends Application {
 			livroComboDev.getItems().add(l);
 	}
 	
+	//carrega tabela com somente livros atrasados
 	private void carregaAtrasados(Boolean deveCarregar){
 		if(deveCarregar){
 			Date d = dataAtualPrograma;
@@ -513,6 +570,7 @@ public class Principal extends Application {
 			atualizaListEmprestimo();	
 	}
 	
+	//load dos livros que nao foram pegos no combobox de empréstimo
 	private void loadLivrosNaoAlugados(){
 		livroCombo.getItems().clear();
 		ArrayList<Livro> livrosNaoAlugados = GerenciaBiblioteca.findLivrosNaoAlugados(listLivros, listEmprestimos);
