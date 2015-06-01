@@ -1,5 +1,6 @@
 package br.usp.icmc.ssc0103.executavel;
 
+import java.time.ZoneId;
 import java.util.*;
 
 import br.usp.icmc.ssc0103.util.*;
@@ -8,6 +9,7 @@ import javafx.application.Application;
 import javafx.collections.*;
 import javafx.geometry.Pos;
 import javafx.scene.*;
+import javafx.scene.chart.PieChart.Data;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.*;
@@ -16,6 +18,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class Principal extends Application {
+	Date dataAtualPrograma = new Date();
 	ManipulaCSV alteracoesArquivo;
 	Stage window;
 	Scene home, sceneUser, sceneLivro, sceneEmprestimos;
@@ -83,9 +86,16 @@ public class Principal extends Application {
 				window.setScene(sceneEmprestimos);
 			}
 		});
-		
+		DatePicker dataPicker = new DatePicker();
+		dataPicker.setValue(dataAtualPrograma.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+		dataPicker.setEditable(false);
+		dataPicker.setOnAction(e -> {
+			dataAtualPrograma.setDate(dataPicker.getValue().getDayOfMonth()); 
+			dataAtualPrograma.setMonth(dataPicker.getValue().getMonthValue()-1);
+			dataAtualPrograma.setYear(dataPicker.getValue().getYear());
+		});
 		VBox layoutHome = new VBox(30);
-		layoutHome.getChildren().addAll(imgView, textHome, options, select);
+		layoutHome.getChildren().addAll(imgView, textHome, options, select,dataPicker);
 		layoutHome.setAlignment(Pos.CENTER);
 		
 		//PAGE: Usuários (Tabela(Lista), campos para cadastro, botao add)
@@ -216,8 +226,8 @@ public class Principal extends Application {
 		textEmprestimos.setFont(new Font(25));
 		
 		TableColumn tcBookEmp = new TableColumn("LIVRO");
-		tcBookEmp.setMinWidth(250);
-		tcBookEmp.setMaxWidth(250);
+		tcBookEmp.setMinWidth(150);
+		tcBookEmp.setMaxWidth(200);
 		tcBookEmp.setCellValueFactory(
 				new PropertyValueFactory<>("livroEmprestado"));
 		
@@ -229,12 +239,27 @@ public class Principal extends Application {
 		
 		TableColumn tcDateEmp = new TableColumn("DATA");
 		tcDateEmp.setMinWidth(100);
-		tcDateEmp.setMaxWidth(100);
+		tcDateEmp.setMaxWidth(200);
 		tcDateEmp.setCellValueFactory(
 				new PropertyValueFactory<>("dataAluguel"));
 		
-		tableEmprestimo.getColumns().addAll(tcBookEmp, tcUserEmp, tcDateEmp);
+		TableColumn tcDateEmpDevolucao = new TableColumn("DATA DEVOLUCAO");
+		tcDateEmpDevolucao.setMinWidth(100);
+		tcDateEmpDevolucao.setMaxWidth(200);
+		tcDateEmpDevolucao.setCellValueFactory(
+				new PropertyValueFactory<>("dataDevolucao"));
+		
+		tableEmprestimo.getColumns().addAll(tcBookEmp, tcUserEmp, tcDateEmp,tcDateEmpDevolucao);
 		tableEmprestimo.setItems(dataEmprestimo);		
+		
+		Label textAtrasado = new Label("Mostrar somente atrasados");
+		CheckBox chkAtrasado = new CheckBox();
+		chkAtrasado.setOnAction((event) -> {
+			carregaAtrasados(chkAtrasado.isSelected());
+		});
+		HBox hbAtrasados = new HBox(2);
+		hbAtrasados.getChildren().addAll(textAtrasado,chkAtrasado);
+		hbAtrasados.setAlignment(Pos.CENTER_RIGHT);
 		
 		textAddEmp = new Label("Novo empréstimo:");
 		textAddEmp.setFont(new Font(16));
@@ -286,8 +311,8 @@ public class Principal extends Application {
 			window.setScene(home);
 		});
 		
-		VBox layoutEmprestimos = new VBox(7);
-		layoutEmprestimos.getChildren().addAll(textEmprestimos, tableEmprestimo, textAddEmp, hbEmp,
+		VBox layoutEmprestimos = new VBox(6);
+		layoutEmprestimos.getChildren().addAll(textEmprestimos, tableEmprestimo,hbAtrasados, textAddEmp, hbEmp,
 				textAddDev, hbDev, msgEmp, backEmprestimos);
 		layoutEmprestimos.setAlignment(Pos.TOP_CENTER);
 		
@@ -354,7 +379,7 @@ public class Principal extends Application {
 			msgEmp.setText("Esta pessoa não pode pegar esse tipo de livro.");
 			return;
 		}
-		Date d = new Date();//TODO
+		Date d = (Date) dataAtualPrograma.clone();
 		Emprestimo novo = new Emprestimo(livro, user, d);
 		user.getLivrosEmprestados().add(livro);
 		listEmprestimos.add(novo);
@@ -370,7 +395,7 @@ public class Principal extends Application {
 			msgEmp.setText("Selecione uma pessoa/livro para empréstimo.");
 			return;
 		}
-		Date d = new Date();//TODO
+		Date d = (Date) dataAtualPrograma.clone();
 		Emprestimo aRemover = new Emprestimo(livro, user, d);
 		listEmprestimos.remove(aRemover);
 		atualizaListEmprestimo();
@@ -408,6 +433,18 @@ public class Principal extends Application {
 			return;
 		for (Livro l:p.getLivrosEmprestados())
 			livroComboDev.getItems().add(l);
+	}
+	
+	private void carregaAtrasados(Boolean deveCarregar){
+		if(deveCarregar){
+			Date d = dataAtualPrograma;
+			dataEmprestimo.clear();
+			ArrayList<Emprestimo> listaAtrasados = GerenciaBiblioteca.findLivrosAtrasados(listEmprestimos, d);
+			for(Emprestimo e:listaAtrasados)
+				dataEmprestimo.add(e);
+		}
+		else
+			atualizaListEmprestimo();	
 	}
 	
 	private void loadLivrosNaoAlugados(){

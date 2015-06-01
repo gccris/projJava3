@@ -98,7 +98,7 @@ public class GerenciaBiblioteca {
 	public static ArrayList<Emprestimo> findLivrosAtrasados(ArrayList<Emprestimo> listEmprestimos,Date dataAtual){
 		ArrayList<Emprestimo> listAtrasados = new ArrayList<Emprestimo>();
 		for(Emprestimo e:listEmprestimos){
-			if(e.getDataAluguel().after(dataAtual))
+			if(dataAtual.after(e.getDataDevolucao()))
 				listAtrasados.add(e);
 		}
 		return listAtrasados;
