@@ -1,5 +1,10 @@
 package br.usp.icmc.ssc0103.executavel;
 
+/*Integrantes:
+Gabriel Campos Cristiano	8937138
+Gustavo Dias Cavalheri		8937159
+Leonardo Ventura			8937211*/
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -250,6 +255,10 @@ public class Principal extends Application {
 		btnSalvarLivro.setMinSize(18, 18);
 		btnSalvarLivro.setMaxSize(22, 22);
 		btnSalvarLivro.setTooltip(new Tooltip("Salvar livros no arquivo CSV"));
+		btnSalvarLivro.setOnAction(e -> {
+			alteracoesArquivo.cadastrarLivro(listLivros);
+			JOptionPane.showMessageDialog(null, "Livros salvos com sucesso.");
+		});
 		hbSalvar.getChildren().addAll(btnSalvarLivro);
 		hbSalvar.setAlignment(Pos.CENTER_RIGHT);
 		
@@ -361,6 +370,12 @@ public class Principal extends Application {
 		btnSalvar.setMinSize(18, 18);
 		btnSalvar.setMaxSize(22, 22);
 		btnSalvar.setTooltip(new Tooltip("Salvar empréstimos no arquivo CSV"));
+		btnSalvar.setOnAction(e -> {
+			alteracoesArquivo.cadastrarEmprestimo(listEmprestimos);
+			alteracoesArquivo.cadastrarPessoa(listPessoas); //salvar suspensoes
+			JOptionPane.showMessageDialog(null, "Emprestimos salvos com sucesso.");
+		});
+		
 		
 		HBox hbAtrasados = new HBox(2);
 		hbAtrasados.getChildren().addAll(textAtrasado,chkAtrasado,btnSalvar);
@@ -479,11 +494,15 @@ public class Principal extends Application {
 			msgEmp.setText("Selecione uma pessoa/livro para empréstimo.");
 			return;
 		}
-		if(livro.getTipo().compareTo("texto") == 0 && user.getTipo().compareTo("comunidade") == 0){
+		if(livro.getTipo().compareTo("Texto") == 0 && user.getTipo().compareTo("Comunidade") == 0){
 			msgEmp.setText("Esta pessoa não pode pegar esse tipo de livro.");
 			return;
 		}
 		Date d = (Date) dataAtualPrograma.clone();
+		if(GerenciaBiblioteca.usuarioLivroAtrasados(listEmprestimos, user, d)){
+			msgEmp.setText("Esta pessoa tem livros em atraso.");
+			return;
+		}
 		if(user.estaSuspenso(d)){
 			msgEmp.setText("Esta pessoa está suspensa.");
 			return;
@@ -591,9 +610,9 @@ public class Principal extends Application {
 	
 	// Método para salvar alterações no CSV
 	private void salvarPrograma(){
-		
-	alteracoesArquivo.cadastrarPessoa(listPessoas);
-		
+		alteracoesArquivo.cadastrarPessoa(listPessoas);		
+		alteracoesArquivo.cadastrarLivro(listLivros);
+		alteracoesArquivo.cadastrarEmprestimo(listEmprestimos);	
 		System.out.println("As alterações foram salvas!");
 	}
 }

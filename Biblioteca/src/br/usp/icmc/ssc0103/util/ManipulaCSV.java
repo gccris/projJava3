@@ -52,7 +52,14 @@ public class ManipulaCSV {
 			}
 			leitor.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			File file = new File(this.nomeArquivoLivros);
+			try {
+				file.createNewFile();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			loadLivros();
 		}catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -64,10 +71,6 @@ public class ManipulaCSV {
 		ArrayList<Pessoa> listUsers = new ArrayList<Pessoa>();
 		BufferedReader leitor = null;
 		String linha;
-		File f = new File(this.nomeArquivoUsuarios);
-		if(!f.exists()) 
-			return null;
-		
 		try {
 			leitor = new BufferedReader(new FileReader(this.nomeArquivoUsuarios));
 			while((linha = leitor.readLine()) != null){
@@ -90,11 +93,17 @@ public class ManipulaCSV {
 			}
 			leitor.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			File file = new File(this.nomeArquivoUsuarios);
+			try {
+				file.createNewFile();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			loadUsuarios();	
 		}catch (IOException e) {
 			e.printStackTrace();
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -114,13 +123,26 @@ public class ManipulaCSV {
 				Pessoa p = GerenciaBiblioteca.findPessoaPorCPF(listUsers,emprestimo[1]);
 				Livro l = GerenciaBiblioteca.findLivroPorCodigo(listLivros,emprestimo[0]);
 				p.pegaEmprestadoLivro(l);
-				Date d = new Date(emprestimo[2]);
+				DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+				Date d = new Date();
+				try {
+					d = df.parse(emprestimo[2]);
+				} catch (ParseException e1) {
+					e1.printStackTrace();
+				}
 				Emprestimo e = new Emprestimo(l,p,d);
 				listEmprestimos.add(e);
 			}
 			leitor.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			File f = new File(this.nomeArquivoEmprestimos);
+			try {
+				f.createNewFile();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			loadEmprestimos(listUsers,listLivros);
 		}catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -131,11 +153,7 @@ public class ManipulaCSV {
 	public void cadastrarPessoa(ArrayList<Pessoa> listPessoas)
 	{
 		FileWriter escritor;
-		Date d = new Date();
-		Integer tipoInserido;
-		
-
-			
+		Integer tipoInserido;	
 		try {
 			escritor = new FileWriter(new File(this.nomeArquivoUsuarios));
 			for(Pessoa p:listPessoas){
@@ -173,16 +191,68 @@ public class ManipulaCSV {
 		
 	}
 	
-	public void cadastrarEmprestimo(Emprestimo emprestimo)
+	public void cadastrarLivro(ArrayList<Livro> listLivro)
 	{
-		FileWriter escritor;
+		FileWriter escritor;	
 		try {
 			escritor = new FileWriter(new File(this.nomeArquivoLivros));
-			//escritor.append(livro.getNome()+","+usuario.getNome());
-			escritor.close();
+			for(Livro l:listLivro){
+				escritor.append(l.getTipo()+","+l.getNome()+","+l.getCodigo()+'\n');
+			}
+				escritor.close();
+				
+		} catch (FileNotFoundException e) {
+			File f = new File(this.nomeArquivoLivros);
+			
+			try {
+				f.createNewFile();
+				escritor = new FileWriter(f);
+				for(Livro l:listLivro){
+					escritor.append(l.getTipo()+","+l.getNome()+","+l.getCodigo()+'\n');
+				}
+					escritor.close();
+			} catch (IOException ex) {
+				System.out.println("erro: "+ex.getMessage());
+			}
+			
 		} catch (IOException ex) {
 			System.out.println("erro: "+ex.getMessage());
 		}
+		
+	}
+	
+	public void cadastrarEmprestimo(ArrayList<Emprestimo> listEmprestimos)
+	{
+		FileWriter escritor;
+		try {
+			escritor = new FileWriter(new File(this.nomeArquivoEmprestimos));
+			for(Emprestimo e:listEmprestimos){
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				String data = dateFormat.format(e.getDataAluguel());
+				escritor.append(e.getLivroEmprestado().getCodigo()+','+e.getPessoaComLivro().getCpf()+','+data+'\n');
+			}
+				escritor.close();
+				
+		} catch (FileNotFoundException e) {
+			File f = new File(this.nomeArquivoEmprestimos);
+			
+			try {
+				f.createNewFile();
+				escritor = new FileWriter(f);
+				for(Emprestimo emp:listEmprestimos){
+					SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+					String data = dateFormat.format(emp.getDataAluguel());
+					escritor.append(emp.getLivroEmprestado().getCodigo()+','+emp.getPessoaComLivro().getCpf()+','+data+'\n');
+				}
+					escritor.close();
+			} catch (IOException ex) {
+				System.out.println("erro: "+ex.getMessage());
+			}
+			
+		} catch (IOException ex) {
+			System.out.println("erro: "+ex.getMessage());
+		}
+		
 	}
 	
 	

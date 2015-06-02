@@ -108,6 +108,15 @@ public class GerenciaBiblioteca {
 		return listAtrasados;
 	}
 	
+	//verifica se o usuario esta com livros atrasados
+	public static Boolean usuarioLivroAtrasados(ArrayList<Emprestimo> listEmprestimos,Pessoa p,Date dataAtual){
+		for(Emprestimo e:listEmprestimos){
+			if(dataAtual.after(e.getDataDevolucao()) && e.getPessoaComLivro().getCpf().compareTo(p.getCpf()) == 0)
+				return true;
+		}
+		return false;
+	}
+	
 	//calcula o tempo atrasado do usuario
 	public static int calculaTempoAtrasado(Emprestimo e,Date dataAtual){
 		DateTime dtAtual = new DateTime(dataAtual);
